@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dating Files</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF7FF;
+    --card: #FFFFFF;
+    --ink: #241C3D;
+    --ink-soft: #79708F;
+    --line: #E7E1F4;
+
+    --coral: #FF6152;
+    --coral-dark: #E5493B;
+    --coral-bg: #FFE4E0;
+
+    --mint: #1FA968;
+    --mint-bg: #D9F9E6;
+    --sky: #1497B0;
+    --sky-bg: #D8F4F8;
+    --sun: #B4790A;
+    --sun-bg: #FFF3D2;
+    --berry: #C43E77;
+    --berry-bg: #FCE1ED;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .app { max-width: 900px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  h1, h2, h3 { font-family: 'Baloo 2', sans-serif; margin: 0 0 4px; font-weight: 700; color: var(--ink); }
+  h1 { font-size: 28px; }
+  h2 { font-size: 21px; }
+  h3 { font-size: 17px; }
+  .sub { color: var(--ink-soft); font-size: 13.5px; margin: 0 0 20px; }
+
+  .card {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+
+  .brand { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 2px solid var(--line); }
+  .brand .name { display: flex; align-items: center; gap: 8px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; }
+  .brand .dots { display: inline-flex; gap: 3px; }
+  .brand .dots span { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .brand .dots span:nth-child(1) { background: var(--coral); }
+  .brand .dots span:nth-child(2) { background: var(--mint); }
+  .brand .dots span:nth-child(3) { background: var(--sky); }
+  .brand nav { display: flex; gap: 4px; }
+  .brand nav button {
+    background: none; border: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+    color: var(--ink-soft); padding: 7px 14px; cursor: pointer; border-radius: 999px;
+  }
+  .brand nav button.active { background: var(--coral-bg); color: var(--coral-dark); }
+
+  input[type=text], textarea, select {
+    width: 100%; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
+    background: var(--bg); border: 2px solid var(--line); border-radius: 12px;
+    padding: 10px 13px; color: var(--ink); margin-bottom: 12px;
+  }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--coral); }
+  textarea { resize: vertical; min-height: 56px; }
+  label { display: block; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 5px; font-weight: 600; }
+  .field { margin-bottom: 14px; }
+
+  button.primary {
+    background: var(--coral); color: #fff; border: none; border-radius: 999px;
+    padding: 11px 20px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s ease, background 0.15s ease;
+  }
+  button.primary:hover { background: var(--coral-dark); }
+  button.primary:active { transform: scale(0.97); }
+  button.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.ghost {
+    background: none; border: 2px solid var(--line); color: var(--ink);
+    border-radius: 999px; padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  button.ghost:hover { border-color: var(--ink-soft); }
+  button.link { background: none; border: none; color: var(--ink-soft); font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--bg);
+    border: 2px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; margin: 0 6px 6px 0;
+  }
+  .chip button { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 13px; padding: 0; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .tap-chip {
+    display: inline-flex; align-items: center; background: var(--bg); border: 2px solid var(--line);
+    border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; user-select: none;
+    transition: transform 0.1s ease;
+  }
+  .tap-chip.selected { background: var(--coral); color: #fff; border-color: var(--coral); }
+  .tap-chip:hover { border-color: var(--ink-soft); }
+  .tap-chip:active { transform: scale(0.96); }
+  .tap-chip.disabled { opacity: 0.4; cursor: not-allowed; }
+  .value-count { font-size: 12px; color: var(--ink-soft); margin-bottom: 10px; font-weight: 600; }
+
+  .stamp {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 5px 13px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+  .stamp.observed { color: var(--mint); background: var(--mint-bg); }
+  .stamp.verified { color: var(--sky); background: var(--sky-bg); }
+  .stamp.unverified { color: var(--sun); background: var(--sun-bg); }
+  .stamp.inferred { color: var(--berry); background: var(--berry-bg); }
+
+  .source-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .source-opt {
+    flex: 1; min-width: 130px; border: 2px solid var(--line); border-radius: 14px; padding: 12px;
+    cursor: pointer; background: var(--bg);
+  }
+  .source-opt .stamp { margin-bottom: 5px; }
+  .source-opt p { margin: 0; font-size: 12px; color: var(--ink-soft); }
+  .source-opt:hover { border-color: var(--ink-soft); }
+  .source-opt.selected-stamp { border-color: var(--ink); background: var(--card); }
+  .guess-tag { font-size: 11.5px; color: var(--ink-soft); margin: 4px 0 0; font-weight: 600; }
+  @keyframes stampPop { 0% { transform: scale(1); } 45% { transform: scale(1.18) rotate(-3deg); } 100% { transform: scale(1) rotate(0); } }
+  .stamp-pop { animation: stampPop 0.35s ease-out; }
+  .know-field-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+  .know-field-row input { margin-bottom: 0; flex: 1; }
+  .know-field-row button { flex-shrink: 0; background: none; border: 2px solid var(--line); border-radius: 999px; color: var(--ink-soft); cursor: pointer; padding: 9px 13px; }
+  .progress-tag { font-size: 12.5px; color: var(--coral-dark); background: var(--coral-bg); display: inline-block; padding: 4px 12px; border-radius: 999px; margin-bottom: 12px; font-weight: 700; }
+
+  .wizard-steps { display: flex; gap: 6px; margin-bottom: 16px; }
+  .wizard-steps span {
+    font-size: 11.5px; color: var(--ink-soft); font-weight: 600; padding: 4px 11px; border: 2px solid var(--line);
+    border-radius: 999px; background: var(--bg);
+  }
+  .wizard-steps span.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .wizard-steps span.done { background: var(--line); }
+
+  .claim-row { padding: 12px 0; border-bottom: 2px dashed var(--line); }
+  .claim-row:last-child { border-bottom: none; }
+  .claim-row .text { font-size: 14.5px; margin: 8px 0 2px; }
+  .claim-row .meta { font-size: 12px; color: var(--ink-soft); }
+  .claim-row .values-match { margin-top: 6px; font-size: 12px; }
+
+  .queued-item {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 8px 0; border-bottom: 2px dashed var(--line); font-size: 13.5px;
+  }
+  .queued-item button { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 12px; }
+
+  .suitor-list { display: flex; flex-direction: column; gap: 10px; }
+  .suitor-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--card); border: 2px solid var(--line); border-radius: 18px;
+    padding: 14px 16px; cursor: pointer; transition: border-color 0.15s ease;
+  }
+  .suitor-item:hover { border-color: var(--coral); }
+  .suitor-item .left { display: flex; align-items: center; }
+  .suitor-item .stat-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .stat-pill { font-size: 11px; font-weight: 600; color: var(--ink-soft); background: var(--bg); border: 2px solid var(--line); border-radius: 999px; padding: 2px 9px; }
+
+  .icon-badge {
+    width: 42px; height: 42px; border-radius: 50%; background: var(--bg);
+    border: 2px solid var(--line); display: inline-flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-right: 12px; flex-shrink: 0; cursor: pointer;
+  }
+  .icon-badge.lg { width: 52px; height: 52px; font-size: 23px; }
+  .icon-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .icon-opt {
+    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; border: 2px solid var(--line); border-radius: 14px; background: var(--bg); cursor: pointer;
+  }
+  .icon-opt.selected { background: var(--coral); color: #fff; border-color: var(--coral); }
+  .icon-opt:hover { border-color: var(--ink-soft); }
+  .profile-header { display: flex; align-items: center; margin-bottom: 4px; }
+
+  .value-tracker {
+    display: inline-block; font-size: 12.5px; font-weight: 600; color: var(--coral-dark); background: var(--coral-bg);
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
+  }
+
+  .rating-row { display: flex; gap: 6px; margin-bottom: 12px; }
+  .rating-row button {
+    flex: 1; padding: 11px 0; border: 2px solid var(--line); background: var(--bg);
+    border-radius: 14px; cursor: pointer; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 16px;
+  }
+  .rating-row button.selected { background: var(--coral); color: #fff; border-color: var(--coral); }
+
+  .toggle-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .toggle-row button {
+    flex: 1; padding: 10px; border: 2px solid var(--line); background: var(--bg);
+    border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 600;
+  }
+  .toggle-row button.selected { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--ink-soft); }
+  .empty h3 { color: var(--ink); }
+
+  .back { font-size: 13px; color: var(--ink-soft); cursor: pointer; margin-bottom: 14px; display: inline-block; font-weight: 600; }
+
+  .loop-item { padding: 10px 0; border-bottom: 2px dashed var(--line); font-size: 13.5px; }
+  .loop-item .who { font-weight: 700; }
+  .loop-item .resolve { margin-top: 6px; display: flex; gap: 8px; }
+  .loop-item .resolve button { font-size: 12px; padding: 6px 12px; }
+
+  .prev-date-item { padding: 10px 0; border-bottom: 2px dashed var(--line); font-size: 13.5px; }
+  .prev-date-item .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .prev-date-item .rating { font-family: 'Baloo 2', sans-serif; font-weight: 700; color: var(--coral); }
+
+  .pattern-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .pattern-bar-row .label { width: 110px; font-size: 13px; flex-shrink: 0; font-weight: 600; }
+  .pattern-bar-track { flex: 1; height: 11px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .pattern-bar-fill { height: 100%; background: var(--coral); border-radius: 999px; }
+  .pattern-bar-row .count { font-size: 12px; color: var(--ink-soft); width: 50px; text-align: right; font-weight: 600; }
+
+  .loading { text-align: center; padding: 60px 20px; color: var(--ink-soft); font-size: 14px; }
+  .notice {
+    background: var(--berry-bg); color: var(--berry); border: 2px solid var(--berry);
+    border-radius: 12px; padding: 9px 13px; font-size: 13px; margin-bottom: 12px; font-weight: 600;
+  }
+  .locked-notice {
+    background: var(--sun-bg); border: 2px solid var(--sun); border-radius: 12px;
+    padding: 10px 13px; font-size: 13px; color: var(--sun); font-weight: 600; margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"><div class="loading">Opening the case file…</div></div>
+
+<script>
+const STORE_KEY = 'dd-state-v3';
+const PRESET_VALUES = ['Ambition','Kindness','Humor','Stability','Curiosity','Honesty','Family','Adventure','Independence','Loyalty','Creativity','Communication','Confidence','Generosity','Patience','Spontaneity','Respect','Reliability'];
+const MAX_VALUES = 8;
+const ICONS = ['\u25cf','\u25b2','\u25a0','\u25c6','\u2605','\u2726','\u263e','\u273f','\u2693','\u26a1'];
+const AVATAR_COLORS = [
+  { bg: '#D9F9E6', fg: '#1FA968' },
+  { bg: '#D8F4F8', fg: '#1497B0' },
+  { bg: '#FFF3D2', fg: '#B4790A' },
+  { bg: '#FCE1ED', fg: '#C43E77' },
+  { bg: '#FFE4E0', fg: '#E5493B' }
+];
+function avatarColor(idx) { return AVATAR_COLORS[(idx || 0) % AVATAR_COLORS.length]; }
+
+let state = {
+  onboarded: false,
+  name: '',
+  statedValues: [],
+  valuesLastEdited: null,
+  suitors: [] // {id, name, icon, evidence:[{id,source,detail1,detail2,valueMatches,loopStatus}], dates:[{...}]}
+};
+let view = { screen: 'loading', suitorId: null };
+let notice = '';
+
+const SOURCE_META = {
+  observed: { label: 'Observed', hint: "Sounds like something you saw for yourself." },
+  verified: { label: 'Told, verified', hint: 'Sounds like something he told you that checked out.' },
+  unverified: {
+    label: 'Told, unverified', hint: "Sounds like something he told you that you haven't confirmed.",
+    followUp: 'What would confirm or contradict this later?', followUpPh: 'e.g. see if it comes up consistently, or ask a follow-up'
+  },
+  inferred: {
+    label: 'Inferred', hint: 'Sounds like your own read on him, not a fact.',
+    followUp: 'What fact would actually prove this?', followUpPh: 'e.g. see how he talks about a setback'
+  }
+};
+const SOURCE_KEYS = ['observed', 'verified', 'unverified', 'inferred'];
+
+function guessFolder(how) {
+  const t = (how || '').toLowerCase();
+  if (/\b(saw|watched|witnessed|noticed|caught|walked in on|observed)\b/.test(t)) return 'observed';
+  if (/\b(confirmed|verified|checked|looked up|found out|googled|fact.?checked|turns out)\b/.test(t)) return 'verified';
+  if (/\b(said|told me|mentioned|claims?|says?|texted)\b/.test(t)) return 'unverified';
+  return 'inferred';
+}
+
+async function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch (e) { /* no saved state yet */ }
+  view.screen = state.onboarded ? 'dashboard' : 'onboarding';
+  render();
+}
+async function saveState() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  catch (e) { console.error('save failed', e); }
+}
+
+function uid() { return Math.random().toString(36).slice(2, 10); }
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+function go(screen, suitorId) { view = { screen, suitorId: suitorId || null }; notice = ''; render(); }
+function getSuitor(id) { return state.suitors.find(s => s.id === id); }
+
+function canEditValues() {
+  if (!state.valuesLastEdited) return true;
+  const days = (Date.now() - new Date(state.valuesLastEdited).getTime()) / 86400000;
+  return days >= 30;
+}
+function nextValuesEditDate() {
+  const d = new Date(state.valuesLastEdited);
+  d.setDate(d.getDate() + 30);
+  return d.toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+}
+
+// ---------- EVIDENCE WIZARD (shared between connection profile, date log, and new-connection setup) ----------
+function freshWizard() { return { step: 1, text: '', how: '', revealed: false, source: null, detail2: '' }; }
+let claimWizard = freshWizard();
+
+function renderWizardSteps() {
+  const labels = ['What you know', 'How you know it'];
+  return `<div class="wizard-steps">${labels.map((l, i) => {
+    const n = i + 1;
+    const cls = n === claimWizard.step ? 'active' : (n < claimWizard.step ? 'done' : '');
+    return `<span class="${cls}">${n}. ${l}</span>`;
+  }).join('')}</div>`;
+}
+
+function renderWizard(mode) {
+  const w = claimWizard;
+  let body = '';
+  if (w.step === 1) {
+    body = `
+      <div class="field">
+        <label>What do you know?</label>
+        <textarea id="w-text" placeholder="e.g. He started as a receptionist and now owns the company" oninput="claimWizard.text=this.value">${esc(w.text)}</textarea>
+      </div>
+      ${notice ? `<div class="notice">${esc(notice)}</div>` : ''}
+      <button class="primary" onclick="wizardNext()">Next: how do you know? \u2192</button>
+    `;
+  } else if (w.step === 2) {
+    body = `
+      <p class="sub" style="margin-bottom:14px;">"${esc(w.text)}"</p>
+      <div class="field">
+        <label>How do you know this?</label>
+        <input type="text" id="w-how" placeholder="e.g. he told me over dinner" value="${esc(w.how)}" oninput="claimWizard.how=this.value">
+      </div>
+      ${notice ? `<div class="notice">${esc(notice)}</div>` : ''}
+      ${!w.revealed ? `
+        <button class="ghost" onclick="wizardBack()">\u2190 back</button>
+        <button class="primary" onclick="wizardReveal()" style="margin-left:8px;">Continue</button>
+      ` : `
+        <p class="sub" style="margin-bottom:8px;">Take a second and check this feels right \u2014 tap a different one if not.</p>
+        <div class="source-picker">
+          ${SOURCE_KEYS.map(k => `
+            <div class="source-opt ${w.source === k ? 'selected-stamp' : ''}" onclick="claimWizard.source='${k}';render();">
+              <span class="stamp ${k} ${w.source === k ? 'stamp-pop' : ''}">${SOURCE_META[k].label}</span>
+              ${w.source === k ? `<p class="guess-tag">Our best guess: ${esc(SOURCE_META[k].hint)}</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        ${SOURCE_META[w.source].followUp ? `
+          <div class="field">
+            <label>${esc(SOURCE_META[w.source].followUp)}</label>
+            <input type="text" id="w-detail2" placeholder="${esc(SOURCE_META[w.source].followUpPh)}" value="${esc(w.detail2)}" oninput="claimWizard.detail2=this.value">
+          </div>
+        ` : ''}
+        <button class="ghost" onclick="claimWizard.revealed=false;render();">\u2190 edit answer</button>
+        <button class="primary" onclick="wizardSave('${mode}')" style="margin-left:8px;">Add to file</button>
+      `}
+    `;
+  }
+  return `${renderWizardSteps()}${body}`;
+}
+
+function wizardNext() {
+  const val = document.getElementById('w-text') ? document.getElementById('w-text').value.trim() : claimWizard.text.trim();
+  if (!val) { notice = 'Write down what you know first.'; render(); return; }
+  claimWizard.text = val;
+  notice = '';
+  claimWizard.step = 2;
+  render();
+}
+function wizardBack() { notice = ''; claimWizard.step = 1; render(); }
+function wizardReveal() {
+  if (!claimWizard.how.trim()) { notice = 'This is the part worth pausing on \u2014 how do you actually know this?'; render(); return; }
+  notice = '';
+  claimWizard.source = guessFolder(claimWizard.how);
+  claimWizard.revealed = true;
+  render();
+}
+
+function wizardSave(mode) {
+  const w = claimWizard;
+  if (SOURCE_META[w.source].followUp && !w.detail2.trim()) { notice = 'Fill this in \u2014 it\'s the part that keeps this honest.'; render(); return; }
+  const evidence = {
+    id: uid(), source: w.source, detail1: w.text, detail2: (w.detail2 || '').trim(),
+    valueMatches: [], loopStatus: w.source === 'unverified' ? 'open' : null
+  };
+  if (mode === 'profile') {
+    evidence.suitorId = view.suitorId;
+    const s = getSuitor(view.suitorId);
+    s.evidence.unshift(evidence);
+    saveState();
+  } else if (mode === 'date') {
+    dateDraft.learned.push(evidence);
+  }
+  claimWizard = freshWizard();
+  notice = '';
+  render();
+}
+
+// ---------- ONBOARDING ----------
+let tempValues = [];
+function renderValueChips(selected, toggleFn, disabledIfFull) {
+  const full = selected.length >= MAX_VALUES;
+  return `
+    <div class="value-count">${selected.length}/${MAX_VALUES} selected</div>
+    <div class="chip-row">
+      ${PRESET_VALUES.map(v => {
+        const isSel = selected.includes(v);
+        const disabled = !isSel && full && disabledIfFull;
+        return `<span class="tap-chip ${isSel ? 'selected' : ''} ${disabled ? 'disabled' : ''}" onclick="${disabled ? '' : `${toggleFn}('${esc(v)}')`}">${esc(v)}</span>`;
+      }).join('')}
+      ${selected.filter(v => !PRESET_VALUES.includes(v)).map(v => `
+        <span class="tap-chip selected" onclick="${toggleFn}('${esc(v)}')">${esc(v)}</span>
+      `).join('')}
+    </div>
+  `;
+}
+function renderOnboarding() {
+  return `
+    <div class="brand"><span class="name"><span class="dots"><span></span><span></span><span></span></span>The Dating Files</span></div>
+    <h1>What are you actually looking for?</h1>
+    <p class="sub">Pick what you think matters to you \u2014 up to ${MAX_VALUES}. As you log real dates, we'll show you whether the people you actually stick around for match this list.</p>
+    <div class="card">
+      <div class="field">
+        <label>What should we call you?</label>
+        <input type="text" id="onb-name" placeholder="Your name" value="${esc(state.name)}">
+      </div>
+      <div class="field">
+        <label>Your values</label>
+        ${renderValueChips(tempValues, 'toggleTempValue', true)}
+        <input type="text" id="onb-value-input" placeholder="Or add your own, press Enter" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTempValue();}">
+      </div>
+      ${notice ? `<div class="notice">${esc(notice)}</div>` : ''}
+      <button class="primary" onclick="finishOnboarding()">Start the case file</button>
+    </div>
+  `;
+}
+function toggleTempValue(v) {
+  if (tempValues.includes(v)) { tempValues = tempValues.filter(x => x !== v); }
+  else {
+    if (tempValues.length >= MAX_VALUES) { notice = `You can pick up to ${MAX_VALUES} values.`; renderInto(); return; }
+    tempValues.push(v);
+  }
+  notice = '';
+  renderInto();
+}
+function addCustomTempValue() {
+  const inp = document.getElementById('onb-value-input');
+  const v = inp.value.trim();
+  if (!v) return;
+  if (tempValues.includes(v)) { inp.value = ''; return; }
+  if (tempValues.length >= MAX_VALUES) { notice = `You can pick up to ${MAX_VALUES} values.`; renderInto(); return; }
+  tempValues.push(v);
+  inp.value = '';
+  notice = '';
+  renderInto();
+}
+function finishOnboarding() {
+  const name = document.getElementById('onb-name').value.trim();
+  if (tempValues.length === 0) { notice = 'Pick at least one value before starting.'; renderInto(); return; }
+  notice = '';
+  state.name = name;
+  state.statedValues = tempValues.slice();
+  state.onboarded = true;
+  saveState();
+  go('dashboard');
+}
+function renderInto() {
+  document.getElementById('app').innerHTML = renderOnboarding();
+}
+
+// ---------- DASHBOARD ----------
+function renderDashboard() {
+  const suitors = state.suitors;
+  return `
+    ${brandNav('dashboard')}
+    <h1>Your connections</h1>
+    <p class="sub">Every profile here separates what you've seen from what you've been told from what you've decided to believe.</p>
+    <button class="primary" onclick="go('newconnection')">+ Add a connection</button>
+    ${suitors.length === 0 ? `
+      <div class="empty">
+        <h3>No open files yet</h3>
+        <p>Add someone above to start separating fact from story.</p>
+      </div>
+    ` : `
+      <div class="suitor-list" style="margin-top:16px;">
+        ${suitors.map(s => {
+          const evCount = s.evidence.length;
+          const dateCount = s.dates.length;
+          const openLoops = s.evidence.filter(e => e.source === 'unverified' && e.loopStatus !== 'resolved').length;
+          const c = avatarColor(s.colorIdx);
+          return `
+            <div class="suitor-item" onclick="go('suitor','${s.id}')">
+              <div class="left">
+                <span class="icon-badge" style="background:${c.bg};color:${c.fg};border-color:${c.bg};">${s.icon}</span>
+                <div>
+                  <h3>${esc(s.name)}</h3>
+                  <div class="stat-pills">
+                    <span class="stat-pill">${dateCount} date${dateCount === 1 ? '' : 's'}</span>
+                    <span class="stat-pill">${evCount} evidence</span>
+                    ${openLoops ? `<span class="stat-pill">${openLoops} open loop${openLoops === 1 ? '' : 's'}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <span class="back">view file \u2192</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `}
+  `;
+}
+function brandNav(active) {
+  return `
+    <div class="brand">
+      <span class="name"><span class="dots"><span></span><span></span><span></span></span>The Dating Files</span>
+      <nav>
+        <button class="${active === 'dashboard' ? 'active' : ''}" onclick="go('dashboard')">Connections</button>
+        <button class="${active === 'patterns' ? 'active' : ''}" onclick="go('patterns')">Patterns</button>
+        <button class="${active === 'values' ? 'active' : ''}" onclick="go('values')">Values</button>
+      </nav>
+    </div>
+  `;
+}
+
+// ---------- NEW CONNECTION SETUP ----------
+let newConnDraft = { name: '', icon: null, knowFields: ['', '', ''] };
+function renderNewConnection() {
+  const d = newConnDraft;
+  return `
+    <span class="back" onclick="go('dashboard')">\u2190 all connections</span>
+    <h1>New connection</h1>
+    <p class="sub">Give them a name and pick an icon to spot them by \u2014 you can change the icon later.</p>
+    <div class="card">
+      <div class="field">
+        <label>Name or nickname</label>
+        <input type="text" id="nc-name" value="${esc(d.name)}" oninput="newConnDraft.name=this.value">
+      </div>
+      <div class="field">
+        <label>Pick an icon</label>
+        <div class="icon-grid">
+          ${ICONS.map(ic => `<div class="icon-opt ${d.icon === ic ? 'selected' : ''}" onclick="pickNewConnIcon('${ic}')">${ic}</div>`).join('')}
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:6px;">
+        <label>What do you know about them so far? (optional \u2014 dump as much or as little as you want)</label>
+        ${d.knowFields.map((v, i) => `
+          <div class="know-field-row">
+            <input type="text" id="know-${i}" placeholder="e.g. works in finance, has a dog named Biscuit" value="${esc(v)}" oninput="newConnDraft.knowFields[${i}]=this.value">
+            ${d.knowFields.length > 1 ? `<button onclick="removeKnowField(${i})">\u00d7</button>` : ''}
+          </div>
+        `).join('')}
+        <button class="ghost" onclick="addKnowField()">+ Add another line</button>
+      </div>
+      ${notice ? `<div class="notice">${esc(notice)}</div>` : ''}
+      <button class="primary" onclick="createConnection()">Create profile</button>
+    </div>
+  `;
+}
+function pickNewConnIcon(ic) { newConnDraft.icon = ic; render(); }
+function addKnowField() { newConnDraft.knowFields.push(''); render(); }
+function removeKnowField(i) { newConnDraft.knowFields.splice(i, 1); render(); }
+function createConnection() {
+  const name = document.getElementById('nc-name').value.trim();
+  if (!name) { notice = 'Give them a name first.'; render(); return; }
+  if (!newConnDraft.icon) { notice = 'Pick an icon to identify them.'; render(); return; }
+  const s = { id: uid(), name, icon: newConnDraft.icon, colorIdx: state.suitors.length, evidence: [], dates: [] };
+  state.suitors.push(s);
+  const facts = newConnDraft.knowFields.map(f => f.trim()).filter(Boolean);
+  newConnDraft = { name: '', icon: null, knowFields: ['', '', ''] };
+  notice = '';
+  saveState();
+  if (facts.length > 0) {
+    classifyQueue = facts;
+    classifyIndex = 0;
+    classifyWizard = { how: '', revealed: false, source: null, detail2: '' };
+    go('classify', s.id);
+  } else {
+    go('suitor', s.id);
+  }
+}
+
+// ---------- CLASSIFY QUEUE (quick gut-check pass after a knowledge dump) ----------
+let classifyQueue = [];
+let classifyIndex = 0;
+let classifyWizard = { how: '', revealed: false, source: null, detail2: '' };
+function renderClassify(suitorId) {
+  const s = getSuitor(suitorId);
+  const text = classifyQueue[classifyIndex];
+  const w = classifyWizard;
+  return `
+    <div class="progress-tag">Quick gut check: item ${classifyIndex + 1} of ${classifyQueue.length}</div>
+    <h1>How do you know this?</h1>
+    <p class="sub">"${esc(text)}"</p>
+    <div class="card">
+      <div class="field">
+        <label>How do you know this?</label>
+        <input type="text" id="cl-how" placeholder="e.g. he told me over dinner" value="${esc(w.how)}" oninput="classifyWizard.how=this.value">
+      </div>
+      ${notice ? `<div class="notice">${esc(notice)}</div>` : ''}
+      ${!w.revealed ? `
+        <button class="ghost" onclick="skipClassifyItem('${s.id}')">Skip this one</button>
+        <button class="primary" onclick="classifyReveal()" style="margin-left:8px;">Continue</button>
+      ` : `
+        <p class="sub" style="margin-bottom:8px;">Take a second and check this feels right \u2014 tap a different one if not.</p>
+        <div class="source-picker">
+          ${SOURCE_KEYS.map(k => `
+            <div class="source-opt ${w.source === k ? 'selected-stamp' : ''}" onclick="classifyWizard.source='${k}';render();">
+              <span class="stamp ${k} ${w.source === k ? 'stamp-pop' : ''}">${SOURCE_META[k].label}</span>
+              ${w.source === k ? `<p class="guess-tag">Our best guess: ${esc(SOURCE_META[k].hint)}</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        ${SOURCE_META[w.source].followUp ? `
+          <div class="field">
+            <label>${esc(SOURCE_META[w.source].followUp)}</label>
+            <input type="text" id="cl-detail2" placeholder="${esc(SOURCE_META[w.source].followUpPh)}" value="${esc(w.detail2)}" oninput="classifyWizard.detail2=this.value">
+          </div>
+        ` : ''}
+        <button class="ghost" onclick="classifyWizard.revealed=false;render();">\u2190 edit answer</button>
+        <button class="primary" onclick="classifySave('${s.id}')" style="margin-left:8px;">Add to file & continue</button>
+      `}
+    </div>
+  `;
+}
+function classifyReveal() {
+  if (!classifyWizard.how.trim()) { notice = 'This is the part worth pausing on \u2014 how do you actually know this?'; render(); return; }
+  notice = '';
+  classifyWizard.source = guessFolder(classifyWizard.how);
+  classifyWizard.revealed = true;
+  render();
+}
+function classifySave(suitorId) {
+  const w = classifyWizard;
+  if (SOURCE_META[w.source].followUp && !w.detail2.trim()) { notice = 'Fill this in \u2014 it\'s the part that keeps this honest.'; render(); return; }
+  const s = getSuitor(suitorId);
+  s.evidence.unshift({
+    id: uid(), suitorId, source: w.source, detail1: classifyQueue[classifyIndex], detail2: (w.detail2 || '').trim(),
+    valueMatches: [], loopStatus: w.source === 'unverified' ? 'open' : null
+  });
+  advanceClassify(suitorId);
+}
+function skipClassifyItem(suitorId) { advanceClassify(suitorId); }
+function advanceClassify(suitorId) {
+  saveState();
+  classifyIndex += 1;
+  classifyWizard = { how: '', revealed: false, source: null, detail2: '' };
+  notice = '';
+  if (classifyIndex >= classifyQueue.length) { go('suitor', suitorId); }
+  else { render(); }
+}
+
+// ---------- CONNECTION PROFILE ----------
+let editingIcon = false;
+function renderSuitor(id) {
+  const s = getSuitor(id);
+  if (!s) return renderDashboard();
+  const evidence = s.evidence;
+  const evCount = evidence.length;
+  const matchedCount = evidence.filter(e => (e.valueMatches || []).length > 0).length;
+  return `
+    <span class="back" onclick="go('dashboard')">\u2190 all connections</span>
+    <div class="profile-header">
+      <span class="icon-badge lg" style="background:${avatarColor(s.colorIdx).bg};color:${avatarColor(s.colorIdx).fg};border-color:${avatarColor(s.colorIdx).bg};" onclick="editingIcon=!editingIcon;render();">${s.icon}</span>
+      <h1>${esc(s.name)}</h1>
+    </div>
+    ${editingIcon ? `
+      <div class="card" style="margin-top:0;">
+        <label>Change icon</label>
+        <div class="icon-grid">
+          ${ICONS.map(ic => `<div class="icon-opt ${s.icon === ic ? 'selected' : ''}" onclick="changeIcon('${s.id}','${ic}')">${ic}</div>`).join('')}
+        </div>
+      </div>
+    ` : ''}
+    <p class="sub">${s.dates.length} date${s.dates.length === 1 ? '' : 's'} logged.</p>
+    ${state.statedValues.length && evCount > 0 ? `<div class="value-tracker">${matchedCount} of ${evCount} pieces of evidence match your values</div><br>` : ''}
+    <button class="primary" onclick="claimWizard=freshWizard();dateDraft=freshDateDraft();go('newdate','${s.id}');">Log a date</button>
+
+    <div class="card" style="margin-top:16px;">
+      <h2>Previous dates</h2>
+      ${s.dates.length === 0 ? `<p class="sub" style="margin:0;">No dates logged yet.</p>` : s.dates.map(dt => `
+        <div class="prev-date-item">
+          <div class="top">
+            <span>${esc(dt.location || 'Untitled date')}${dt.activity ? ' \u2014 ' + esc(dt.activity) : ''}</span>
+            ${dt.rating ? `<span class="rating">${dt.rating}/5</span>` : ''}
+          </div>
+          ${dt.ratingWhy ? `<div class="meta">${esc(dt.ratingWhy)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <h2>Add evidence</h2>
+      ${renderWizard('profile')}
+    </div>
+
+    <div class="card">
+      <h2>The evidence</h2>
+      ${evidence.length === 0 ? `<p class="sub" style="margin:0;">What did you learn about them? The file's not going to build itself \u2014 add your first piece of evidence above.</p>` : evidence.map(e => renderEvidence(e, s.id)).join('')}
+    </div>
+  `;
+}
+function changeIcon(suitorId, ic) {
+  const s = getSuitor(suitorId);
+  s.icon = ic;
+  editingIcon = false;
+  saveState();
+  render();
+}
+function renderEvidence(e, suitorId) {
+  const meta = SOURCE_META[e.source];
+  const matched = state.statedValues.filter(v => (e.valueMatches || []).includes(v));
+  return `
+    <div class="claim-row">
+      <span class="stamp ${e.source}">${meta.label}</span>
+      <div class="text">${esc(e.detail1)}</div>
+      ${e.detail2 ? `<div class="meta">${esc(meta.followUp)} ${esc(e.detail2)}</div>` : ''}
+      ${e.source === 'unverified' ? `
+        <div class="meta">Open loop
+          ${e.loopStatus === 'resolved' ? ' \u00b7 resolved' : `
+            \u2014 <button class="link" onclick="resolveLoop('${suitorId}','${e.id}','confirmed')">mark confirmed</button>
+            <button class="link" onclick="resolveLoop('${suitorId}','${e.id}','contradicted')">mark contradicted</button>
+          `}
+        </div>
+      ` : ''}
+      ${state.statedValues.length ? `
+        <div class="values-match">
+          <div class="chip-row">
+            ${state.statedValues.map(v => `
+              <span class="tap-chip ${(e.valueMatches||[]).includes(v) ? 'selected' : ''}" onclick="toggleValueMatch('${suitorId}','${e.id}','${esc(v)}')">${esc(v)}</span>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+function toggleValueMatch(suitorId, evId, value) {
+  const s = getSuitor(suitorId);
+  const e = s.evidence.find(e => e.id === evId);
+  e.valueMatches = e.valueMatches || [];
+  if (e.valueMatches.includes(value)) e.valueMatches = e.valueMatches.filter(v => v !== value);
+  else e.valueMatches.push(value);
+  saveState();
+  render();
+}
+function resolveLoop(suitorId, evId, outcome) {
+  const s = getSuitor(suitorId);
+  const e = s.evidence.find(e => e.id === evId);
+  e.loopStatus = 'resolved';
+  e.source = outcome === 'confirmed' ? 'verified' : 'inferred';
+  if (outcome === 'contradicted') e.detail1 = e.detail1 + ' (turned out not to be true)';
+  saveState();
+  render();
+}
+
+// ---------- NEW DATE LOG ----------
+let dateDraft = null;
+function freshDateDraft() {
+  return {
+    location: '', activity: '', plannedNext: null, rating: null, ratingWhy: '',
+    initiator: null, feeling: null, mindQuestions: '', talkedAbout: '', learned: [], valueTags: []
+  };
+}
+function renderNewDate(suitorId) {
+  const s = getSuitor(suitorId);
+  if (!dateDraft) dateDraft = freshDateDraft();
+  const d = dateDraft;
+  return `
+    <span class="back" onclick="go('suitor','${s.id}')">\u2190 ${esc(s.name)}'s file</span>
+    <h1>Date download</h1>
+    <p class="sub">Get it down while it's fresh.</p>
+
+    <div class="card">
+      <h2>Logistics</h2>
+      <div class="field"><label>Where did you go?</label><input type="text" id="d-location" value="${esc(d.location)}" oninput="dateDraft.location=this.value"></div>
+      <div class="field"><label>What did you do?</label><input type="text" id="d-activity" value="${esc(d.activity)}" oninput="dateDraft.activity=this.value"></div>
+      <div class="field">
+        <label>Was another date planned?</label>
+        <div class="toggle-row">
+          <button class="${d.plannedNext === true ? 'selected' : ''}" onclick="setDateField('plannedNext', true)">Yes</button>
+          <button class="${d.plannedNext === false ? 'selected' : ''}" onclick="setDateField('plannedNext', false)">No</button>
+          <button class="${d.plannedNext === 'maybe' ? 'selected' : ''}" onclick="setDateField('plannedNext', 'maybe')">Left open</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Rate it</h2>
+      <div class="rating-row">
+        ${[1,2,3,4,5].map(n => `<button class="${d.rating === n ? 'selected' : ''}" onclick="setDateField('rating', ${n})">${n}</button>`).join('')}
+      </div>
+      <div class="field"><label>Why that number?</label><textarea id="d-ratingWhy" oninput="dateDraft.ratingWhy=this.value">${esc(d.ratingWhy)}</textarea></div>
+      ${state.statedValues.length ? `
+        <div class="field" style="margin-bottom:0;">
+          <label>Did tonight feel like your values? Tap any that fit \u2014 skip if nothing comes to mind.</label>
+          <div class="chip-row">
+            ${state.statedValues.map(v => `
+              <span class="tap-chip ${d.valueTags.includes(v) ? 'selected' : ''}" onclick="toggleDateValueTag('${esc(v)}')">${esc(v)}</span>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="card">
+      <h2>The conversation</h2>
+      <div class="field">
+        <label>Who asked more questions?</label>
+        <div class="toggle-row">
+          <button class="${d.initiator === 'him' ? 'selected' : ''}" onclick="setDateField('initiator','him')">He asked me</button>
+          <button class="${d.initiator === 'me' ? 'selected' : ''}" onclick="setDateField('initiator','me')">I volunteered</button>
+          <button class="${d.initiator === 'both' ? 'selected' : ''}" onclick="setDateField('initiator','both')">Both, evenly</button>
+        </div>
+      </div>
+      <div class="field"><label>What did you talk about?</label><textarea id="d-talkedAbout" oninput="dateDraft.talkedAbout=this.value">${esc(d.talkedAbout)}</textarea></div>
+    </div>
+
+    <div class="card">
+      <h2>How you felt</h2>
+      <div class="field">
+        <label>Positive or negative after?</label>
+        <div class="toggle-row">
+          <button class="${d.feeling === 'positive' ? 'selected' : ''}" onclick="setDateField('feeling','positive')">Positive</button>
+          <button class="${d.feeling === 'mixed' ? 'selected' : ''}" onclick="setDateField('feeling','mixed')">Mixed</button>
+          <button class="${d.feeling === 'negative' ? 'selected' : ''}" onclick="setDateField('feeling','negative')">Negative</button>
+        </div>
+      </div>
+      <div class="field"><label>What questions are going through your mind?</label><textarea id="d-mindQuestions" oninput="dateDraft.mindQuestions=this.value">${esc(d.mindQuestions)}</textarea></div>
+    </div>
+
+    <div class="card">
+      <h2>What did you learn?</h2>
+      <p class="sub">Add as many as you want \u2014 each one goes through the same steps.</p>
+      ${d.learned.length > 0 ? d.learned.map((e, i) => `
+        <div class="queued-item">
+          <div>
+            <span class="stamp ${e.source}">${SOURCE_META[e.source].label}</span>
+            <div class="text" style="margin-top:4px;">${esc(e.detail1)}</div>
+          </div>
+          <button onclick="removeLearned(${i})">remove</button>
+        </div>
+      `).join('') : ''}
+      ${renderWizard('date')}
+    </div>
+
+    <button class="primary" onclick="saveDate('${s.id}')">Save this date to the file</button>
+    <button class="ghost" onclick="claimWizard=freshWizard();dateDraft=null;go('suitor','${s.id}')" style="margin-left:8px;">Cancel</button>
+  `;
+}
+function setDateField(field, value) { dateDraft[field] = value; render(); }
+function toggleDateValueTag(value) {
+  if (dateDraft.valueTags.includes(value)) dateDraft.valueTags = dateDraft.valueTags.filter(v => v !== value);
+  else dateDraft.valueTags.push(value);
+  render();
+}
+function removeLearned(i) { dateDraft.learned.splice(i, 1); render(); }
+function saveDate(suitorId) {
+  const s = getSuitor(suitorId);
+  const d = dateDraft;
+  const entry = {
+    id: uid(), location: d.location, activity: d.activity, plannedNext: d.plannedNext,
+    rating: d.rating, ratingWhy: d.ratingWhy, initiator: d.initiator, talkedAbout: d.talkedAbout,
+    feeling: d.feeling, mindQuestions: d.mindQuestions, valueTags: d.valueTags
+  };
+  s.dates.unshift(entry);
+  d.learned.forEach(e => { e.suitorId = s.id; s.evidence.unshift(e); });
+  claimWizard = freshWizard();
+  dateDraft = null;
+  saveState();
+  go('suitor', suitorId);
+}
+
+// ---------- VALUES SCREEN ----------
+function renderValues() {
+  const locked = !canEditValues();
+  return `
+    ${brandNav('values')}
+    <h1>Your values</h1>
+    <p class="sub">Stated up front. As you log more, the Patterns tab shows what you actually keep choosing.</p>
+    <div class="card">
+      ${locked ? `
+        <div class="locked-notice">You can update your values once a month. Next edit available ${nextValuesEditDate()}.</div>
+        <div class="chip-row">
+          ${state.statedValues.map(v => `<span class="tap-chip selected">${esc(v)}</span>`).join('')}
+        </div>
+      ` : `
+        ${renderValueChips(state.statedValues, 'toggleStatedValue', true)}
+        <input type="text" id="add-value-input" placeholder="Or add your own, press Enter" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomStatedValue();}">
+        ${notice ? `<div class="notice">${esc(notice)}</div>` : ''}
+      `}
+    </div>
+  `;
+}
+function markValuesEdited() { state.valuesLastEdited = new Date().toISOString(); }
+function toggleStatedValue(v) {
+  if (!canEditValues()) return;
+  if (state.statedValues.includes(v)) state.statedValues = state.statedValues.filter(x => x !== v);
+  else {
+    if (state.statedValues.length >= MAX_VALUES) { notice = `You can pick up to ${MAX_VALUES} values.`; render(); return; }
+    state.statedValues.push(v);
+  }
+  notice = '';
+  markValuesEdited();
+  saveState();
+  render();
+}
+function addCustomStatedValue() {
+  if (!canEditValues()) return;
+  const inp = document.getElementById('add-value-input');
+  const v = inp.value.trim();
+  if (!v || state.statedValues.includes(v)) return;
+  if (state.statedValues.length >= MAX_VALUES) { notice = `You can pick up to ${MAX_VALUES} values.`; render(); return; }
+  state.statedValues.push(v);
+  markValuesEdited();
+  saveState();
+  render();
+}
+
+// ---------- PATTERNS ----------
+function renderPatterns() {
+  const allEvidence = state.suitors.flatMap(s => s.evidence.map(e => ({...e, suitorName: s.name})));
+  const allDates = state.suitors.flatMap(s => s.dates.map(d => ({...d, suitorName: s.name})));
+
+  const valueCounts = {};
+  const valueRatingSum = {};
+  const valueRatingN = {};
+  state.statedValues.forEach(v => { valueCounts[v] = 0; valueRatingSum[v] = 0; valueRatingN[v] = 0; });
+  allEvidence.forEach(e => (e.valueMatches || []).forEach(v => { valueCounts[v] = (valueCounts[v] || 0) + 1; }));
+  allDates.forEach(d => (d.valueTags || []).forEach(v => {
+    valueCounts[v] = (valueCounts[v] || 0) + 1;
+    if (d.rating) { valueRatingSum[v] = (valueRatingSum[v] || 0) + d.rating; valueRatingN[v] = (valueRatingN[v] || 0) + 1; }
+  }));
+  const maxCount = Math.max(1, ...Object.values(valueCounts));
+
+  const openLoops = allEvidence.filter(e => e.source === 'unverified' && e.loopStatus !== 'resolved');
+  const highRated = allDates.filter(d => d.rating >= 4);
+  const initiatorCounts = { him: 0, me: 0, both: 0 };
+  allDates.forEach(d => { if (d.initiator) initiatorCounts[d.initiator]++; });
+
+  return `
+    ${brandNav('patterns')}
+    <h1>What the file shows</h1>
+    <p class="sub">Stated values vs. what actually shows up in the evidence you've tagged.</p>
+
+    <div class="card">
+      <h2>Revealed values</h2>
+      ${state.statedValues.length === 0 ? `<p class="sub" style="margin:0;">Set up your values first.</p>` : `
+        <p class="sub">How often each value shows up \u2014 from evidence you've tagged and dates you've tapped.</p>
+        ${state.statedValues.map(v => `
+          <div class="pattern-bar-row">
+            <span class="label">${esc(v)}</span>
+            <div class="pattern-bar-track"><div class="pattern-bar-fill" style="width:${(valueCounts[v]||0)/maxCount*100}%"></div></div>
+            <span class="count">${valueCounts[v] || 0}\u00d7</span>
+          </div>
+        `).join('')}
+      `}
+    </div>
+
+    <div class="card">
+      <h2>What actually earns a good night</h2>
+      <p class="sub">Average rating of dates tagged with each value.</p>
+      ${state.statedValues.filter(v => valueRatingN[v] > 0).length === 0 ? `<p class="sub" style="margin:0;">Tag a few dates with values, and rate them, to see this fill in.</p>` : `
+        ${state.statedValues.filter(v => valueRatingN[v] > 0).sort((a,b) => (valueRatingSum[b]/valueRatingN[b]) - (valueRatingSum[a]/valueRatingN[a])).map(v => {
+          const avg = valueRatingSum[v] / valueRatingN[v];
+          return `
+            <div class="pattern-bar-row">
+              <span class="label">${esc(v)}</span>
+              <div class="pattern-bar-track"><div class="pattern-bar-fill" style="width:${avg/5*100}%"></div></div>
+              <span class="count">${avg.toFixed(1)}/5</span>
+            </div>
+          `;
+        }).join('')}
+      `}
+    </div>
+
+    <div class="card">
+      <h2>Open loops</h2>
+      <p class="sub">Things he told you that you haven't confirmed yet.</p>
+      ${openLoops.length === 0 ? `<p class="sub" style="margin:0;">No open loops right now.</p>` : openLoops.map(e => `
+        <div class="loop-item">
+          <span class="who">${esc(e.suitorName)}</span> \u2014 ${esc(e.detail1)}
+          <div class="resolve">
+            <button class="ghost" onclick="resolveLoop('${e.suitorId}','${e.id}','confirmed')">Confirmed</button>
+            <button class="ghost" onclick="resolveLoop('${e.suitorId}','${e.id}','contradicted')">Contradicted</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <h2>Conversation balance</h2>
+      <p class="sub">Across ${allDates.length} logged date${allDates.length === 1 ? '' : 's'}.</p>
+      ${allDates.length === 0 ? `<p class="sub" style="margin:0;">Log a date to see this.</p>` : `
+        <div class="pattern-bar-row"><span class="label">He asked me</span><div class="pattern-bar-track"><div class="pattern-bar-fill" style="width:${initiatorCounts.him/allDates.length*100}%"></div></div><span class="count">${initiatorCounts.him}</span></div>
+        <div class="pattern-bar-row"><span class="label">I volunteered</span><div class="pattern-bar-track"><div class="pattern-bar-fill" style="width:${initiatorCounts.me/allDates.length*100}%"></div></div><span class="count">${initiatorCounts.me}</span></div>
+        <div class="pattern-bar-row"><span class="label">Both, evenly</span><div class="pattern-bar-track"><div class="pattern-bar-fill" style="width:${initiatorCounts.both/allDates.length*100}%"></div></div><span class="count">${initiatorCounts.both}</span></div>
+      `}
+    </div>
+
+    <div class="card">
+      <h2>Your highest-rated dates</h2>
+      ${highRated.length === 0 ? `<p class="sub" style="margin:0;">Nothing rated 4 or 5 yet.</p>` : `
+        ${highRated.slice(0,5).map(d => `<div class="claim-row"><span class="who" style="font-weight:600;">${esc(d.suitorName)}</span> \u2014 ${d.rating}/5 ${d.ratingWhy ? '\u2014 ' + esc(d.ratingWhy) : ''}</div>`).join('')}
+      `}
+    </div>
+  `;
+}
+
+// ---------- ROUTER ----------
+function render() {
+  const app = document.getElementById('app');
+  if (view.screen === 'onboarding') app.innerHTML = renderOnboarding();
+  else if (view.screen === 'dashboard') app.innerHTML = renderDashboard();
+  else if (view.screen === 'newconnection') app.innerHTML = renderNewConnection();
+  else if (view.screen === 'classify') app.innerHTML = renderClassify(view.suitorId);
+  else if (view.screen === 'suitor') app.innerHTML = renderSuitor(view.suitorId);
+  else if (view.screen === 'newdate') app.innerHTML = renderNewDate(view.suitorId);
+  else if (view.screen === 'values') app.innerHTML = renderValues();
+  else if (view.screen === 'patterns') app.innerHTML = renderPatterns();
+}
+
+loadState();
+</script>
+</body>
+</html>
