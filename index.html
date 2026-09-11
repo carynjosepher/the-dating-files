@@ -234,12 +234,18 @@
     padding: 10px 13px; font-size: 13px; color: var(--sun); font-weight: 600; margin-bottom: 14px;
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app" id="app"><div class="loading">Opening the case file…</div></div>
 
 <script>
-const STORE_KEY = 'dd-state-v3';
+// ---- Supabase setup: paste your own values from Settings > API in your Supabase project ----
+const SUPABASE_URL = 'https://hdfuujbneajoitayhfmm.supabase.co/rest/v1/';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkZnV1amJuZWFqb2l0YXloZm1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNTEyNzUsImV4cCI6MjEwNDcyNzI3NX0.VcGibq8SWCGqyIsGRPIZ-GhL58AYYABscRDyTOwB8AA';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let session = null;
+
 const PRESET_VALUES = ['Ambition','Kindness','Humor','Stability','Curiosity','Honesty','Family','Adventure','Independence','Loyalty','Creativity','Communication','Confidence','Generosity','Patience','Spontaneity','Respect','Reliability'];
 const MAX_VALUES = 8;
 const ICONS = ['\u25cf','\u25b2','\u25a0','\u25c6','\u2605','\u2726','\u263e','\u273f','\u2693','\u26a1'];
@@ -252,13 +258,16 @@ const AVATAR_COLORS = [
 ];
 function avatarColor(idx) { return AVATAR_COLORS[(idx || 0) % AVATAR_COLORS.length]; }
 
-let state = {
-  onboarded: false,
-  name: '',
-  statedValues: [],
-  valuesLastEdited: null,
-  suitors: [] // {id, name, icon, evidence:[{id,source,detail1,detail2,valueMatches,loopStatus}], dates:[{...}]}
-};
+function freshState() {
+  return {
+    onboarded: false,
+    name: '',
+    statedValues: [],
+    valuesLastEdited: null,
+    suitors: [] // {id, name, icon, evidence:[{id,source,detail1,detail2,valueMatches,loopStatus}], dates:[{...}]}
+  };
+}
+let state = freshState();
 let view = { screen: 'loading', suitorId: null };
 let notice = '';
 
@@ -284,17 +293,68 @@ function guessFolder(how) {
   return 'inferred';
 }
 
+// ---- Auth + cloud storage ----
+async function initAuth() {
+  const { data } = await sb.auth.getSession();
+  session = data.session;
+  sb.auth.onAuthStateChange((_event, sess) => {
+    session = sess;
+    if (session) loadState();
+    else { state = freshState(); view.screen = 'login'; render(); }
+  });
+  if (session) await loadState();
+  else { view.screen = 'login'; render(); }
+}
+
 async function loadState() {
+  state = freshState();
   try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (raw) state = JSON.parse(raw);
-  } catch (e) { /* no saved state yet */ }
+    const { data } = await sb.from('app_data').select('data').eq('user_id', session.user.id).maybeSingle();
+    if (data && data.data) state = data.data;
+  } catch (e) { console.error('load failed', e); }
   view.screen = state.onboarded ? 'dashboard' : 'onboarding';
   render();
 }
 async function saveState() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-  catch (e) { console.error('save failed', e); }
+  if (!session) return;
+  try {
+    await sb.from('app_data').upsert({ user_id: session.user.id, data: state, updated_at: new Date().toISOString() });
+  } catch (e) { console.error('save failed', e); }
+}
+async function logout() {
+  await sb.auth.signOut();
+}
+
+function renderLogin() {
+  return `
+    <div class="brand"><span class="name"><span class="dots"><span></span><span></span><span></span></span>The Dating Files</span></div>
+    <h1>Sign in</h1>
+    <p class="sub">We'll email you a link \u2014 no password to remember.</p>
+    <div class="card">
+      <div class="field"><label>Email</label><input type="text" id="login-email" placeholder="you@example.com"></div>
+      ${notice ? `<div class="notice">${esc(notice)}</div>` : ''}
+      <button class="primary" onclick="sendMagicLink()">Send sign-in link</button>
+    </div>
+  `;
+}
+async function sendMagicLink() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) { notice = 'Enter your email first.'; render(); return; }
+  const redirectTo = window.location.href.split('#')[0].split('?')[0];
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
+  if (error) { notice = error.message; render(); return; }
+  notice = '';
+  view.screen = 'login-sent';
+  render();
+}
+function renderLoginSent() {
+  return `
+    <div class="brand"><span class="name"><span class="dots"><span></span><span></span><span></span></span>The Dating Files</span></div>
+    <div class="card">
+      <h2>Check your email</h2>
+      <p class="sub" style="margin-bottom:0;">We sent a sign-in link \u2014 open it on this device to get in. You can close this tab.</p>
+    </div>
+  `;
 }
 
 function uid() { return Math.random().toString(36).slice(2, 10); }
@@ -531,6 +591,7 @@ function brandNav(active) {
         <button class="${active === 'dashboard' ? 'active' : ''}" onclick="go('dashboard')">Connections</button>
         <button class="${active === 'patterns' ? 'active' : ''}" onclick="go('patterns')">Patterns</button>
         <button class="${active === 'values' ? 'active' : ''}" onclick="go('values')">Values</button>
+        <button onclick="logout()">Log out</button>
       </nav>
     </div>
   `;
@@ -1023,7 +1084,9 @@ function renderPatterns() {
 // ---------- ROUTER ----------
 function render() {
   const app = document.getElementById('app');
-  if (view.screen === 'onboarding') app.innerHTML = renderOnboarding();
+  if (view.screen === 'login') app.innerHTML = renderLogin();
+  else if (view.screen === 'login-sent') app.innerHTML = renderLoginSent();
+  else if (view.screen === 'onboarding') app.innerHTML = renderOnboarding();
   else if (view.screen === 'dashboard') app.innerHTML = renderDashboard();
   else if (view.screen === 'newconnection') app.innerHTML = renderNewConnection();
   else if (view.screen === 'classify') app.innerHTML = renderClassify(view.suitorId);
@@ -1033,7 +1096,7 @@ function render() {
   else if (view.screen === 'patterns') app.innerHTML = renderPatterns();
 }
 
-loadState();
+initAuth();
 </script>
 </body>
 </html>
